@@ -7,7 +7,10 @@ const IssueSchema = new mongoose.Schema({
         type: Date, 
         default: Date.now()
     },
-    updated_on: Date,
+    updated_on: {
+        type: Date,
+        default: Date.now()
+    },
     created_by: String,
     assigned_to: String,
     open: {
@@ -17,4 +20,4 @@ const IssueSchema = new mongoose.Schema({
     status_text: String
 });
 
-module.exports = IssueSchema.model("Issue", IssueSchema);
+module.exports = mongoose.model("Issue", IssueSchema);

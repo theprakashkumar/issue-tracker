@@ -9,7 +9,10 @@ require('dotenv').config();
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
+
 const mongoose = require('mongoose');
+const Issue = require('./models/issue')
+const Project = require('./models/project');
 
 let app = express();
 
@@ -21,12 +24,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connect with database
-// mongoose.connect(process.env.DB, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// })
-// .then(() => console.log("Connected :)"))
-// .catch(err => console.log("Someting Went Wrong :(", err));
+mongoose.connect(process.env.DB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("Connected :)"))
+.catch(err => console.log("Someting Went Wrong :(", err));
 
 //Sample front-end
 app.route('/:project/')
