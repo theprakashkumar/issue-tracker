@@ -13,11 +13,20 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
-      let issue_title;
-      let issue_text;
-      let created_on;
-      let created_by;
+
+      let searchQuery = req.query;
       
+      if(searchQuery.opne){
+        searchQuery.open = String(searchQuery.open) === "true";
+      }
+      
+      Issue.find(searchQuery, (err, issueArray) => {
+        if(err){
+          console.log(err);
+        }else{
+          res.json(issueArray);
+        }
+      }) 
     })
     
     // If you send a POST request to /api/issues/{projectname} without the required fields, returned will be the error { error: 'required field(s) missing' }
@@ -29,6 +38,7 @@ module.exports = function (app) {
       Project.findOne({name: project}, (err, foundProject) => {
         if(err){
           console.log(err);
+          
         // if project found
         }else if(foundProject){
           // create a new issue
@@ -75,7 +85,33 @@ module.exports = function (app) {
     // put is use to overwrite
     .put(function (req, res){
       let project = req.params.project;
-      
+      let body = req.body;
+      // Store `id` and delete it.
+      let id = body._id;
+      delete body._id;
+
+      let updates = req.body;
+      // Delete all field which is empty.
+      for(let update in updates){
+        if(!updates[update]) delete update[update];
+      }
+      // Extract boolean from string.
+      if(updates.open) updates.open = String(!updates.open) === "true";
+      if(Object.keys(updates).length === 0){
+        res.send("no updated field sent");
+      }else{
+        updates.updated_on = new Date();
+        Issue.findByIdAndUpdate(id, updates, (err, updatedIssue) => {
+          if(err){
+            console.log(err);
+            res.json({ error: 'could not update', '_id': id });
+          }else{
+            res.send({
+              result: 'successfully updated','_id': id
+            })
+          }
+        })
+      }
     })
     
 
@@ -83,9 +119,20 @@ module.exports = function (app) {
     
     .delete(function (req, res){
       let project = req.params.project;
-      
+      Issue.deleteOne({_id: req.body._id}, (err) => {
+        if(err){
+          console.log(err);
+        }else{
+          res.json({
+            result: 'successfully deleted',
+            _id: req.body._id
+          })
+        }
+      })
     });
     
 };
 
 // {"assigned_to":"","status_text":"","open":true,"_id":"5ffaf0391e4e61664fae937c","issue_title":"king","issue_text":"kings issue","created_by":"kingg","created_on":"2021-01-10T12:16:57.386Z","updated_on":"2021-01-10T12:16:57.386Z"}
+
+// 5ffc573d1e4e61664fae939e

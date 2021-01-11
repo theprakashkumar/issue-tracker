@@ -26,7 +26,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Connect with database
 mongoose.connect(process.env.DB, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 })
 .then(() => console.log("Connected :)"))
 .catch(err => console.log("Someting Went Wrong :(", err));
