@@ -16,7 +16,7 @@ module.exports = function (app) {
 
       let searchQuery = req.query;
       
-      if(searchQuery.opne){
+      if(searchQuery.open){
         searchQuery.open = String(searchQuery.open) === "true";
       }
       
@@ -34,44 +34,49 @@ module.exports = function (app) {
     .post(function (req, res){
       let project = req.params.project;
       let body = req.body;
-      // look if project already exist
-      Project.findOne({name: project}, (err, foundProject) => {
-        if(err){
-          console.log(err);
-          
-        // if project found
-        }else if(foundProject){
-          // create a new issue
-          Issue.create({
-            issue_title: body.issue_title,
-            issue_text: body.issue_text,
-            created_by: body.created_by,
-            assigned_to: body.assigned_to,
-            status_text: body.status_text
-          }, (err, newIssue) => {
-            err ? console.log(err) : (foundProject.issue.push(newIssue), res.json(newIssue));
-            });
-        }else if(!foundProject){
-          Project.create({
-            name: project
-          }, (err, newUser) => {
-            if(err){
-              console.log(err);
-            }else{
-              Issue.create({
-                issue_title: body.issue_title,
-                issue_text: body.issue_text,
-                created_by: body.created_by,
-                assigned_to: body.assigned_to,
-                status_text: body.status_text
-              }, (err, newIssue) => {
-                err ? console.log(err) : newUser.issue.push(newIssue);
-                });
-            }
-            res.json(newIssue);
-          })
-        }
-      }) 
+
+      if(body.issue_title || !body.issue_text || !body.created_by){
+        res.json({error: 'missing inputs'});
+      }else{
+        // look if project already exist
+        Project.findOne({name: project}, (err, foundProject) => {
+          if(err){
+            console.log(err);   
+          // if there is no project
+          }else if(!foundProject.length){
+            Project.create({
+              name: project
+            }, (err, newProject) => {
+              if(err){
+                console.log(err);
+              }else{
+                Issue.create({
+                  issue_title: body.issue_title,
+                  issue_text: body.issue_text,
+                  created_by: body.created_by,
+                  assigned_to: body.assigned_to,
+                  status_text: body.status_text
+                }, (err, newIssue) => {
+                  err ? console.log(err) : newProject.issue.push(newIssue);
+                  });
+              }
+              res.json(newIssue);
+            })
+          // if we get matched project
+          }else if(foundProject){
+            // create a new issue
+            Issue.create({
+              issue_title: body.issue_title,
+              issue_text: body.issue_text,
+              created_by: body.created_by,
+              assigned_to: body.assigned_to,
+              status_text: body.status_text
+            }, (err, newIssue) => {
+              err ? console.log(err) : (foundProject.issue.push(newIssue), res.json(newIssue));
+              });
+          }
+        }) 
+      }
     })
 
       // You can send a PUT request to /api/issues/{projectname} with an _id and one or more fields to update. On success, the updated_on field should be updated, and returned should be {  result: 'successfully updated', '_id': _id }.
@@ -97,8 +102,9 @@ module.exports = function (app) {
       }
       // Extract boolean from string.
       if(updates.open) updates.open = String(!updates.open) === "true";
+      // if no updates were sent
       if(Object.keys(updates).length === 0){
-        res.send("no updated field sent");
+        res.json({'error': 'no update field(s) sent', '_id': id });
       }else{
         updates.updated_on = new Date();
         Issue.findByIdAndUpdate(id, updates, (err, updatedIssue) => {
