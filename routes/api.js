@@ -35,8 +35,8 @@ module.exports = function (app) {
       let project = req.params.project;
       let body = req.body;
 
-      if(body.issue_title || !body.issue_text || !body.created_by){
-        res.json({error: 'missing inputs'});
+      if(!body.issue_title || !body.issue_text || !body.created_by){
+        res.json({error: 'required field(s) missing'});
       }else{
         // look if project already exist
         Project.findOne({name: project}, (err, foundProject) => {
@@ -57,10 +57,9 @@ module.exports = function (app) {
                   assigned_to: body.assigned_to,
                   status_text: body.status_text
                 }, (err, newIssue) => {
-                  err ? console.log(err) : newProject.issue.push(newIssue);
+                  err ? console.log(err) : (newProject.issue.push(newIssue), res.json(newIssue));   
                   });
               }
-              res.json(newIssue);
             })
           // if we get matched project
           }else if(foundProject){
@@ -85,7 +84,7 @@ module.exports = function (app) {
 
       // When the PUT request sent to /api/issues/{projectname} does not include update fields, the return value is { error: 'no update field(s) sent', '_id': _id }. On any other error, the return value is { error: 'could not update', '_id': _id }.
 
-
+      // TODO: have to add check to close the issue
 
     // put is use to overwrite
     .put(function (req, res){
@@ -125,9 +124,12 @@ module.exports = function (app) {
     
     .delete(function (req, res){
       let project = req.params.project;
+
+      if(!req.body._id) res.json({'error': 'missing _id'});
       Issue.deleteOne({_id: req.body._id}, (err) => {
         if(err){
           console.log(err);
+          res.json({ error: 'could not delete', '_id': req.body._id });
         }else{
           res.json({
             result: 'successfully deleted',
