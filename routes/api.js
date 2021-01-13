@@ -43,7 +43,7 @@ module.exports = function (app) {
           if(err){
             console.log(err);   
           // if there is no project
-          }else if(!foundProject.length){
+          }else if(foundProject===null){
             Project.create({
               name: project
             }, (err, newProject) => {
@@ -125,8 +125,10 @@ module.exports = function (app) {
     .delete(function (req, res){
       let project = req.params.project;
 
-      if(!req.body._id) res.json({'error': 'missing _id'});
-      Issue.deleteOne({_id: req.body._id}, (err) => {
+      if(!req.body._id){
+          res.json({'error': 'missing _id'});
+      }else{
+          Issue.deleteOne({_id: req.body._id}, (err) => {
         if(err){
           console.log(err);
           res.json({ error: 'could not delete', '_id': req.body._id });
@@ -137,8 +139,8 @@ module.exports = function (app) {
           })
         }
       })
+      }
     });
-    
 };
 
 // {"assigned_to":"","status_text":"","open":true,"_id":"5ffaf0391e4e61664fae937c","issue_title":"king","issue_text":"kings issue","created_by":"kingg","created_on":"2021-01-10T12:16:57.386Z","updated_on":"2021-01-10T12:16:57.386Z"}
