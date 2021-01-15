@@ -7,6 +7,6 @@ let ProjectSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Issuse"
     }]
-})
+});
 
 module.exports = mongoose.model("Project", ProjectSchema);
