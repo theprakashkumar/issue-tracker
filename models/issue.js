@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 const IssueSchema = new mongoose.Schema({
     assigned_to: String,
-    status_text: String,
+    status_text: {
+        type: String,
+        default: ""
+    },
     open: {
         type: Boolean,
         default: true

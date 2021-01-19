@@ -1,5 +1,6 @@
 'use strict';
 
+const { update } = require('../models/issue');
 const Issue = require('../models/issue');
 const Project = require('../models/project');
 
@@ -97,22 +98,29 @@ module.exports = function (app) {
       let updates = req.body;
       // Delete all field which is empty.
       for(let update in updates){
-        if(!updates[update]) delete update[update];
+        if(!updates[update]) delete updates[update];
       }
       // Extract boolean from string.
       if(updates.open) updates.open = String(!updates.open) === "true";
       // if no updates were sent
-      if(Object.keys(updates).length === 0){
-        res.json({'error': 'no update field(s) sent', '_id': id });
+      if(Object.keys(updates).length < 2){
+        if(!id){
+          return res.json({ error: 'missing _id' });
+          }
+          return res.json({error: 'no update field(s) sent', '_id': id });
       }else{
         updates.updated_on = new Date();
         Issue.findByIdAndUpdate(id, updates, (err, updatedIssue) => {
           if(err){
             console.log(err);
-            res.json({ error: 'could not update', '_id': id });
+            return res.json({ 
+              error: 'could not update', 
+              _id: id 
+            });
           }else{
-            res.send({
-              result: 'successfully updated','_id': id
+            return res.send({
+              result: 'successfully updated',
+              _id: id
             })
           }
         })
@@ -126,20 +134,26 @@ module.exports = function (app) {
       let project = req.params.project;
 
       if(!req.body._id){
-          res.json({'error': 'missing _id'});
-      }else{
-          Issue.deleteOne({_id: req.body._id}, (err) => {
-        if(err){
-          console.log(err);
-          res.json({ error: 'could not delete', '_id': req.body._id });
-        }else{
-          res.json({
-            result: 'successfully deleted',
-            _id: req.body._id
+        console.log("Missing");
+        return res.send({
+          error: 'missing _id'
+        });
+      }
+
+      Issue.findByIdAndDelete(req.body._id, (err, issue) => {
+        if (err) {
+          console.log("could not delete");
+          return res.json({
+            error: 'could not delete',
+            '_id': req.body._id 
           })
         }
-      })
-      }
+        console.log("success");
+        res.json({
+          result: 'successfully deleted',
+          '_id': req.body._id 
+        });
+      });
     });
 };
 

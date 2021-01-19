@@ -97,3 +97,6 @@ module.exports = app; //for testing
 //   "assigned_to":"secf",
 //   "status_text":"",
 //   "__v":0}
+// {"open":true,"created_on":"2021-01-17T08:22:07.380Z","updated_on":"2021-01-17T08:22:07.380Z","_id":"6003f3c45f14fd1896915468","issue_title":"first ","issue_text":"first text","created_by":"firster","assigned_to":"","status_text":"","__v":0}
+
+// {"assigned_to":"","status_text":"","open":true,"_id":"6003f40783c646762441b8fe","issue_title":"first","issue_text":"first text","created_by":"firster","created_on":"2021-01-17T08:23:35.989Z","updated_on":"2021-01-17T08:23:35.989Z"}
