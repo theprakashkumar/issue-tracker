@@ -3,6 +3,9 @@
 const { update } = require('../models/issue');
 const Issue = require('../models/issue');
 const Project = require('../models/project');
+const mongoose = require('mongoose');
+
+mongoose.model("Issue");
 
 module.exports = function (app) {
 
@@ -20,14 +23,19 @@ module.exports = function (app) {
       if(searchQuery.open){
         searchQuery.open = String(searchQuery.open) === "true";
       }
-      
-      Issue.find(searchQuery, (err, issueArray) => {
-        if(err){
-          console.log(err);
-        }else{
-          res.json(issueArray);
+
+      Project.find({name: project}).populate('issue').exec((err, populatedProject) => {
+      if(err) console.log(err);
+      let filteredIssue = populatedProject[0].issue;
+      if(searchQuery){
+        for(var parameter in searchQuery){
+          filteredIssue = filteredIssue.filter(issue => {
+            return issue[parameter] === searchQuery[parameter];
+          });
         }
-      }) 
+      } 
+      res.send(filteredIssue);
+      })
     })
     
     // If you send a POST request to /api/issues/{projectname} without the required fields, returned will be the error { error: 'required field(s) missing' }
@@ -58,7 +66,14 @@ module.exports = function (app) {
                   assigned_to: body.assigned_to,
                   status_text: body.status_text
                 }, (err, newIssue) => {
-                  err ? console.log(err) : (newProject.issue.push(newIssue), res.json(newIssue));   
+                  if(err){
+                    console.log(err);
+                  }
+                  // made new project and new issue now push new issue to newly made project
+                  newProject.issue.push(newIssue);
+                  newProject.save((err, savedProject) => {
+                    err ? console.log(err) : res.json(newIssue);
+                  });
                   });
               }
             })
@@ -72,8 +87,14 @@ module.exports = function (app) {
               assigned_to: body.assigned_to,
               status_text: body.status_text
             }, (err, newIssue) => {
-              err ? console.log(err) : (foundProject.issue.push(newIssue), res.json(newIssue));
+              if(err){
+                console.log(err);
+              }
+              foundProject.issue.push(newIssue);
+              foundProject.save((err, savedProject) => {
+                err ? console.log(err) : res.json(newIssue);
               });
+               });
           }
         }) 
       }
@@ -97,8 +118,8 @@ module.exports = function (app) {
 
       let updates = req.body;
       // Delete all field which is empty.
-      for(let update in updates){
-        if(!updates[update]) delete updates[update];
+      for(let data in updates){
+        if(!updates[data]) delete updates[data];
       }
       // Extract boolean from string.
       if(updates.open) updates.open = String(!updates.open) === "true";
@@ -118,7 +139,7 @@ module.exports = function (app) {
               _id: id 
             });
           }else{
-            return res.send({
+            return res.json({
               result: 'successfully updated',
               _id: id
             })
@@ -134,7 +155,7 @@ module.exports = function (app) {
       let project = req.params.project;
 
       if(!req.body._id){
-        console.log("Missing");
+        // console.log("Missing");
         return res.send({
           error: 'missing _id'
         });
@@ -142,13 +163,13 @@ module.exports = function (app) {
 
       Issue.findByIdAndDelete(req.body._id, (err, issue) => {
         if (err) {
-          console.log("could not delete");
+          // console.log("could not delete");
           return res.json({
-            error: 'could not delete',
+            // error: 'could not delete',
             '_id': req.body._id 
           })
         }
-        console.log("success");
+        //console.log("success");
         res.json({
           result: 'successfully deleted',
           '_id': req.body._id 

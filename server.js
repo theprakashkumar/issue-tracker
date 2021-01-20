@@ -6,13 +6,13 @@ const expect      = require('chai').expect;
 const cors        = require('cors');
 require('dotenv').config();
 
-const apiRoutes         = require('./routes/api.js');
-const fccTestingRoutes  = require('./routes/fcctesting.js');
-const runner            = require('./test-runner');
-
 const mongoose = require('mongoose');
 const Issue = require('./models/issue')
 const Project = require('./models/project');
+
+const apiRoutes         = require('./routes/api.js');
+const fccTestingRoutes  = require('./routes/fcctesting.js');
+const runner            = require('./test-runner');
 
 let app = express();
 

@@ -5,7 +5,7 @@ let ProjectSchema = new mongoose.Schema({
     name: String,
     issue: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Issuse"
+        ref: "Issue"
     }]
 });
 
