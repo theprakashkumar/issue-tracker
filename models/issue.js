@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const IssueSchema = new mongoose.Schema({
-    assigned_to: String,
+    assigned_to: {
+        type: String,
+        default: ""
+    },
     status_text: {
         type: String,
         default: ""

@@ -4,6 +4,7 @@ const { update } = require('../models/issue');
 const Issue = require('../models/issue');
 const Project = require('../models/project');
 const mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
 
 mongoose.model("Issue");
 
@@ -14,7 +15,12 @@ module.exports = function (app) {
     // You can send a GET request to /api/issues/{projectname} for an array of all issues for that specific projectname, with all the fields present for each issue.
 
     // You can send a GET request to /api/issues/{projectname} and filter the request by also passing along any field and value as a URL query (ie. /api/issues/{project}?open=false). You can pass one or more field/value pairs at once.
-  
+    // .get(function(req, res){
+    //   Issue.findById(req.query._id, (err, found) => {
+    //     if(err) console.log(err);
+    //     res.send(found);
+    //   })
+    // })
     .get(function (req, res){
       let project = req.params.project;
 
@@ -24,13 +30,21 @@ module.exports = function (app) {
         searchQuery.open = String(searchQuery.open) === "true";
       }
 
+      // if(searchQuery._id){
+      //   searchQuery._id = ObjectId(searchQuery._id);
+      //   console.log(searchQuery._id);
+
+      // }
+
+      //console.log(searchQuery._id);
+
       Project.find({name: project}).populate('issue').exec((err, populatedProject) => {
       if(err) console.log(err);
       let filteredIssue = populatedProject[0].issue;
       if(searchQuery){
         for(var parameter in searchQuery){
           filteredIssue = filteredIssue.filter(issue => {
-            return issue[parameter] === searchQuery[parameter];
+            return issue[parameter] == searchQuery[parameter];
           });
         }
       } 
@@ -123,17 +137,17 @@ module.exports = function (app) {
       }
       // Extract boolean from string.
       if(updates.open) updates.open = String(!updates.open) === "true";
-      // if no updates were sent
-      if(Object.keys(updates).length < 2){
-        if(!id){
-          return res.json({ error: 'missing _id' });
-          }
+      // if no id sent
+      if(!id){
+        return res.json({ error: 'missing _id' });
+      }else if(Object.keys(updates).length === 0){
           return res.json({error: 'no update field(s) sent', '_id': id });
       }else{
         updates.updated_on = new Date();
         Issue.findByIdAndUpdate(id, updates, (err, updatedIssue) => {
-          if(err){
-            console.log(err);
+          // handle err and when there is not matched id
+          if(err || updatedIssue===null){
+            console.log("put", err);
             return res.json({ 
               error: 'could not update', 
               _id: id 
@@ -162,10 +176,10 @@ module.exports = function (app) {
       }
 
       Issue.findByIdAndDelete(req.body._id, (err, issue) => {
-        if (err) {
+        if (err || issue===null) {
           // console.log("could not delete");
           return res.json({
-            // error: 'could not delete',
+            error: 'could not delete',
             '_id': req.body._id 
           })
         }
