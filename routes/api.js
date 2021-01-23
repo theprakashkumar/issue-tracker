@@ -4,7 +4,6 @@ const { update } = require('../models/issue');
 const Issue = require('../models/issue');
 const Project = require('../models/project');
 const mongoose = require('mongoose');
-var ObjectId = require('mongodb').ObjectID;
 
 mongoose.model("Issue");
 
@@ -147,7 +146,7 @@ module.exports = function (app) {
         Issue.findByIdAndUpdate(id, updates, (err, updatedIssue) => {
           // handle err and when there is not matched id
           if(err || updatedIssue===null){
-            console.log("put", err);
+            console.log(err);
             return res.json({ 
               error: 'could not update', 
               _id: id 
