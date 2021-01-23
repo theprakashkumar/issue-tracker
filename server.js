@@ -75,28 +75,3 @@ app.listen(process.env.PORT || 3000, function () {
 });
 
 module.exports = app; //for testing
-
-
-// {
-//   "assigned_to":"second",
-//   "status_text":"",
-//   "open":true,
-//   "_id":"5fff38609dbc6049319aa255",
-//   "issue_title":"first",
-//   "issue_text":"first text",
-//   "created_by":"Firster",
-//   "created_on":"2021-01-13T18:13:52.828Z","updated_on":"2021-01-13T18:13:52.828Z"
-// }
-
-// {
-//   "open":true,
-//   "created_on":"2021-01-13T18:16:19.752Z","updated_on":"2021-01-13T18:16:19.752Z","_id":"5fff3a0ea8af08237654c5ae",
-//   "issue_title":"fristf",
-//   "issue_text":"first textif",
-//   "created_by":"fif",
-//   "assigned_to":"secf",
-//   "status_text":"",
-//   "__v":0}
-// {"open":true,"created_on":"2021-01-17T08:22:07.380Z","updated_on":"2021-01-17T08:22:07.380Z","_id":"6003f3c45f14fd1896915468","issue_title":"first ","issue_text":"first text","created_by":"firster","assigned_to":"","status_text":"","__v":0}
-
-// {"assigned_to":"","status_text":"","open":true,"_id":"6003f40783c646762441b8fe","issue_title":"first","issue_text":"first text","created_by":"firster","created_on":"2021-01-17T08:23:35.989Z","updated_on":"2021-01-17T08:23:35.989Z"}

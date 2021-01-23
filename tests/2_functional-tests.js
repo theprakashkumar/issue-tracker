@@ -87,7 +87,7 @@ suite('Functional Tests', function () {
                     assert.property(res.body, "created_by");
                     assert.equal(res.body.created_by, "Text- Create an Issue With Every Field Filled In");
                     done();
-                })
+                });
         });
 
         // Create an issue with missing required fields: POST request to /api/issues/{project}
@@ -101,7 +101,6 @@ suite('Functional Tests', function () {
                 .post('/api/issues/test')
                 .send(testData)
                 .end(function (err, res) {
-                    console.log(res);
                     assert.equal(res.status, 200);
                     assert.equal(res.body.error, 'required field(s) missing');
                     done();
@@ -401,19 +400,3 @@ suite('Functional Tests', function () {
     });
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Delete an issue: DELETE request to /api/issues/{project}
-// Delete an issue with an invalid _id: DELETE request to /api/issues/{project}
-// Delete an issue with missing _id: DELETE request to /api/issues/{project}
